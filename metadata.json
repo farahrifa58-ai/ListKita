@@ -1,0 +1,6 @@
+{
+  "name": "ListKita",
+  "description": "Aplikasi sederhana dan fleksibel untuk membuat, mengedit, menyimpan, dan membagikan berbagai jenis daftar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
