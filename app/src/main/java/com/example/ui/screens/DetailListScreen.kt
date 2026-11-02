@@ -14,15 +14,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.example.data.AppCurrency
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Check
@@ -76,9 +80,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import com.example.data.ListItemEntity
 import com.example.localization.AppLanguage
 import com.example.localization.Strings
+import com.example.util.NumberFormatUtils
 import com.example.ui.components.CategoryBadge
 import com.example.ui.components.ConfirmDeleteDialog
 import com.example.ui.components.ManageColumnsDialog
@@ -106,6 +113,7 @@ fun DetailListScreen(
 ) {
     val context = LocalContext.current
     val language by viewModel.language.collectAsState()
+    val currency by viewModel.currency.collectAsState()
     val listWithItems by viewModel.currentListWithItems.collectAsState()
 
     var isEditMode by remember { mutableStateOf(initialEditMode) }
@@ -368,7 +376,7 @@ fun DetailListScreen(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Tekan tombol + Tambah Item untuk mulai mengisi daftar ini.",
+                            text = "Tekan tombol Tambah Item untuk mulai mengisi daftar ini.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -503,6 +511,7 @@ fun DetailListScreen(
     if (showItemBottomSheet) {
         ModernItemBottomSheet(
             language = language,
+            currency = currency,
             item = editingItem,
             customColumns = customColumns,
             onDismiss = { showItemBottomSheet = false },
@@ -711,8 +720,13 @@ fun ModernItemRowCard(
                                     shape = RoundedCornerShape(6.dp),
                                     color = MaterialTheme.colorScheme.surfaceVariant
                                 ) {
+                                    val formattedVal = if (NumberFormatUtils.isNominalColumn(k)) {
+                                        NumberFormatUtils.formatNominal(v)
+                                    } else {
+                                        v
+                                    }
                                     Text(
-                                        text = "$k: $v",
+                                        text = "$k: $formattedVal",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -791,6 +805,7 @@ fun ModernItemRowCard(
 @Composable
 fun ModernItemBottomSheet(
     language: AppLanguage,
+    currency: AppCurrency,
     item: ListItemEntity?,
     customColumns: List<String>,
     onDismiss: () -> Unit,
@@ -829,6 +844,8 @@ fun ModernItemBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 36.dp)
         ) {
@@ -926,10 +943,27 @@ fun ModernItemBottomSheet(
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
+                    val isPriceCol = NumberFormatUtils.isNominalColumn(colName)
                     OutlinedTextField(
                         value = customMap[colName] ?: "",
-                        onValueChange = { customMap[colName] = it },
-                        placeholder = { Text("Isi $colName...") },
+                        onValueChange = { input ->
+                            customMap[colName] = if (isPriceCol) {
+                                NumberFormatUtils.formatNominal(input)
+                            } else {
+                                input
+                            }
+                        },
+                        keyboardOptions = if (isPriceCol) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
+                        placeholder = { Text(if (isPriceCol) "cth: 25.000" else "Isi $colName...") },
+                        prefix = if (isPriceCol) {
+                            {
+                                Text(
+                                    text = "${currency.symbol} ",
+                                    fontWeight = FontWeight.Bold,
+                                    color = PrimaryBlue
+                                )
+                            }
+                        } else null,
                         singleLine = true,
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth()

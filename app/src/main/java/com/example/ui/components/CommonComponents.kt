@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -103,6 +104,7 @@ val ALL_CATEGORIES = listOf(
 @Composable
 fun ModernHomeHeader(
     language: AppLanguage,
+    isGradientHeader: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -117,30 +119,30 @@ fun ModernHomeHeader(
                 text = Strings.get("welcome_title", language),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = if (isGradientHeader) Color.White.copy(alpha = 0.9f) else MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = Strings.get("my_lists_title", language),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = if (isGradientHeader) Color.White else MaterialTheme.colorScheme.onBackground,
                 letterSpacing = (-0.5).sp
             )
         }
 
         Surface(
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(14.dp),
             color = Color.White,
-            shadowElevation = 2.dp,
-            modifier = Modifier.size(44.dp)
+            shadowElevation = 3.dp,
+            modifier = Modifier.size(46.dp)
         ) {
             Image(
                 painter = painterResource(id = com.example.R.drawable.ic_listkita_logo),
                 contentDescription = "ListKita Logo",
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(3.dp)
+                    .padding(4.dp)
                     .clip(RoundedCornerShape(10.dp))
             )
         }
@@ -489,7 +491,11 @@ fun ManageColumnsDialog(
             )
         },
         text = {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding()
+            ) {
                 Text(
                     text = Strings.get("manage_columns_desc", language),
                     style = MaterialTheme.typography.bodySmall,

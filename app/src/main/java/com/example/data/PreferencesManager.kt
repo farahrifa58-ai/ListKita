@@ -30,6 +30,9 @@ class PreferencesManager(context: Context) {
     private val _language = MutableStateFlow(loadLanguage())
     val language: StateFlow<AppLanguage> = _language.asStateFlow()
 
+    private val _currency = MutableStateFlow(loadCurrency())
+    val currency: StateFlow<AppCurrency> = _currency.asStateFlow()
+
     private val _themeMode = MutableStateFlow(loadThemeMode())
     val themeMode: StateFlow<ThemeMode> = _themeMode.asStateFlow()
 
@@ -49,6 +52,11 @@ class PreferencesManager(context: Context) {
         }
     }
 
+    private fun loadCurrency(): AppCurrency {
+        val savedCode = prefs.getString(KEY_CURRENCY, null)
+        return AppCurrency.fromCode(savedCode)
+    }
+
     private fun loadThemeMode(): ThemeMode {
         val savedTheme = prefs.getString(KEY_THEME_MODE, null)
         return ThemeMode.fromCode(savedTheme)
@@ -57,6 +65,11 @@ class PreferencesManager(context: Context) {
     fun setLanguage(language: AppLanguage) {
         prefs.edit().putString(KEY_LANGUAGE, language.code).apply()
         _language.value = language
+    }
+
+    fun setCurrency(currency: AppCurrency) {
+        prefs.edit().putString(KEY_CURRENCY, currency.code).apply()
+        _currency.value = currency
     }
 
     fun setThemeMode(mode: ThemeMode) {
@@ -71,6 +84,7 @@ class PreferencesManager(context: Context) {
 
     companion object {
         private const val KEY_LANGUAGE = "pref_app_language"
+        private const val KEY_CURRENCY = "pref_app_currency"
         private const val KEY_THEME_MODE = "pref_theme_mode"
         private const val KEY_LAST_BACKUP = "pref_last_backup_time"
     }

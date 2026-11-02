@@ -58,6 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -135,16 +136,34 @@ fun MyListsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Header: Selamat datang 👋 & Daftar Saya
-            ModernHomeHeader(language = language)
+            // Header Background: Blue gradient at top blending smoothly downward to white
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                PrimaryBlue,
+                                PrimaryBlue.copy(alpha = 0.85f),
+                                PrimaryBlue.copy(alpha = 0.20f),
+                                MaterialTheme.colorScheme.background
+                            )
+                        )
+                    )
+                    .padding(top = 4.dp, bottom = 8.dp)
+            ) {
+                Column {
+                    ModernHomeHeader(language = language, isGradientHeader = true)
 
-            // Modern Search Bar: Cari daftar...
-            Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
-                ModernSearchBar(
-                    query = searchQuery,
-                    onQueryChange = { viewModel.searchQuery.value = it },
-                    placeholderText = Strings.get("search_hint_modern", language)
-                )
+                    // Modern Search Bar: Cari daftar...
+                    Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
+                        ModernSearchBar(
+                            query = searchQuery,
+                            onQueryChange = { viewModel.searchQuery.value = it },
+                            placeholderText = Strings.get("search_hint_modern", language)
+                        )
+                    }
+                }
             }
 
             // Categories Filter & Sort Bar: Semua | Produk | Makanan | Belanja | Stok | Lainnya

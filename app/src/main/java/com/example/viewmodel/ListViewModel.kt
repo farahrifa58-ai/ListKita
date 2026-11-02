@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.AppCurrency
 import com.example.data.BackupRepository
 import com.example.data.ListEntity
 import com.example.data.ListItemEntity
@@ -36,8 +37,9 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
     val preferencesManager = PreferencesManager(application)
     val backupRepository = BackupRepository(application, listDao, preferencesManager)
 
-    // Language & Theme
+    // Language, Currency & Theme
     val language: StateFlow<AppLanguage> = preferencesManager.language
+    val currency: StateFlow<AppCurrency> = preferencesManager.currency
     val themeMode: StateFlow<ThemeMode> = preferencesManager.themeMode
     val lastBackupTime: StateFlow<Long> = preferencesManager.lastBackupTime
 
@@ -129,6 +131,10 @@ class ListViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setLanguage(lang: AppLanguage) {
         preferencesManager.setLanguage(lang)
+    }
+
+    fun setCurrency(currency: AppCurrency) {
+        preferencesManager.setCurrency(currency)
     }
 
     fun setThemeMode(mode: ThemeMode) {
